@@ -35,7 +35,7 @@ namespace cpplox {
 
         void addToken(TokenType type);
 
-        void addToken(TokenType type, Literal *literal);
+        void addToken(TokenType type, Object *literal);
 
         bool match(char expected);
 

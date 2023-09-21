@@ -7,7 +7,7 @@
 
 namespace cpplox {
 
-    Token::Token(TokenType type, std::string lexeme, Literal *literal, int line) {
+    Token::Token(TokenType type, std::string lexeme, Object *literal, int line) {
         this->type = type;
         this->lexeme = std::move(lexeme);
         this->literal = literal;
@@ -27,34 +27,25 @@ namespace cpplox {
         other.literal = nullptr;
     }
 
-    Boolean::Boolean(bool value) {
-        this->value = value;
+    Token &Token::operator=(Token &&other) noexcept {
+        if (this != &other) {
+            delete literal;
+
+            this->literal = other.literal;
+            this->lexeme = std::move(other.lexeme);
+            this->line = other.line;
+            this->type = other.type;
+
+            other.literal = nullptr;
+        }
+        return *this;
     }
 
-    std::string Boolean::toString() {
-        return value ? "true" : "false";
+    Token::Token() {
+        this->literal = nullptr;
+        this->lexeme = std::string();
+        this->type = TokenType::NIL;
+        this->line = 0;
     }
-
-    Boolean::~Boolean() = default;
-
-    Number::Number(double value) {
-        this->value = value;
-    }
-
-    std::string Number::toString() {
-        return std::to_string(value);
-    }
-
-    Number::~Number() = default;
-
-    String::String(std::string value) {
-        this->value = std::move(value);
-    }
-
-    std::string String::toString() {
-        return value;
-    }
-
-    String::~String() = default;
 
 }

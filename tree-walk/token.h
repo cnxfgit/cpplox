@@ -6,45 +6,9 @@
 #define CPPLOX_TOKEN_H
 
 #include <string>
+#include "object.h"
 
 namespace cpplox {
-
-    class Literal {
-    public:
-        virtual std::string toString() = 0;
-
-        virtual ~Literal() = default;
-    };
-
-    class Boolean : public Literal {
-        bool value;
-    public:
-        explicit Boolean(bool value);
-
-        std::string toString() override;
-
-        ~Boolean() override;
-    };
-
-    class Number : public Literal {
-        double value;
-    public:
-        explicit Number(double value);
-
-        std::string toString() override;
-
-        ~Number() override;
-    };
-
-    class String : public Literal {
-        std::string value;
-    public:
-        explicit String(std::string value);
-
-        std::string toString() override;
-
-        ~String() override;
-    };
 
     enum class TokenType {
         // Single-character tokens.
@@ -71,12 +35,16 @@ namespace cpplox {
     public:
         TokenType type;
         std::string lexeme;
-        Literal *literal;
+        Object *literal;
         int line;
 
-        Token(TokenType type, std::string lexeme, Literal *literal, int line);
+        Token();
+
+        Token(TokenType type, std::string lexeme, Object *literal, int line);
 
         Token(Token &&other) noexcept;
+
+        Token& operator=(Token &&other) noexcept;
 
         ~Token();
     };

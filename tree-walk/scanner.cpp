@@ -145,7 +145,7 @@ namespace cpplox {
         addToken(type, nullptr);
     }
 
-    void Scanner::addToken(TokenType type, Literal *literal) {
+    void Scanner::addToken(TokenType type, Object *literal) {
         std::string text = source.substr(start, current - start);
         tokens.emplace_back(type, text, literal, line);
     }
