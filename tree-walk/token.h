@@ -44,7 +44,11 @@ namespace cpplox {
 
         Token(Token &&other) noexcept;
 
+        Token(const Token &other) noexcept;
+
         Token& operator=(Token &&other) noexcept;
+
+        Token& operator=(const Token &other) noexcept;
 
         ~Token();
     };

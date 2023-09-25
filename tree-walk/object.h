@@ -12,6 +12,8 @@ namespace cpplox{
     public:
         virtual std::string toString() = 0;
 
+        virtual Object* clone() = 0;
+
         virtual ~Object() = default;
     };
 
@@ -21,6 +23,8 @@ namespace cpplox{
         explicit Boolean(bool value);
 
         std::string toString() override;
+
+        Object* clone() override;
 
         ~Boolean() override;
     };
@@ -32,6 +36,8 @@ namespace cpplox{
 
         std::string toString() override;
 
+        Object* clone() override;
+
         ~Number() override;
     };
 
@@ -41,6 +47,8 @@ namespace cpplox{
         explicit String(std::string value);
 
         std::string toString() override;
+
+        Object* clone() override;
 
         ~String() override;
     };

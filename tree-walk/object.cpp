@@ -13,6 +13,10 @@ namespace cpplox{
         return value ? "true" : "false";
     }
 
+    Object *Boolean::clone() {
+        return new Boolean(this->value);
+    }
+
     Boolean::~Boolean() = default;
 
     Number::Number(double value) {
@@ -23,14 +27,22 @@ namespace cpplox{
         return std::to_string(value);
     }
 
+    Object *Number::clone() {
+        return new Number(this->value);
+    }
+
     Number::~Number() = default;
 
     String::String(std::string value) {
-        this->value = std::move(value);
+        this->value = value;
     }
 
     std::string String::toString() {
         return value;
+    }
+
+    Object *String::clone() {
+        return new String(*this);
     }
 
     String::~String() = default;

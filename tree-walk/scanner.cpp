@@ -47,14 +47,14 @@ namespace cpplox {
         this->line = 1;
     }
 
-    std::vector<Token> &Scanner::scanTokens() {
+    std::vector<Token> Scanner::scanTokens() {
         while (!isAtEnd()) {
             // We are at the beginning of the next lexeme.
             start = current;
             scanToken();
         }
         tokens.emplace_back(TokenType::END, "", nullptr, line);
-        return tokens;
+        return std::move(tokens);
     }
 
     bool Scanner::isAtEnd() {

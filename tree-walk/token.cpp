@@ -48,4 +48,25 @@ namespace cpplox {
         this->line = 0;
     }
 
+    Token &Token::operator=(const Token &other) noexcept {
+        if (this != &other) {
+            if (other.literal != nullptr) {
+                this->literal = other.literal->clone();
+            }
+            this->lexeme = other.lexeme;
+            this->line = other.line;
+            this->type = other.type;
+        }
+        return *this;
+    }
+
+    Token::Token(const Token &other) noexcept {
+        if (other.literal != nullptr) {
+            this->literal = other.literal->clone();
+        }
+        this->lexeme = other.lexeme;
+        this->line = other.line;
+        this->type = other.type;
+    }
+
 }

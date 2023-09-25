@@ -25,7 +25,7 @@ namespace cpplox {
 
         ~Scanner();
 
-        std::vector<Token> &scanTokens();
+        std::vector<Token> scanTokens();
 
         void scanToken();
 

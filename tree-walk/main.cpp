@@ -6,6 +6,8 @@
 #include <sstream>
 #include <utility>
 #include "scanner.h"
+#include "parser.h"
+#include "token.h"
 
 namespace cpplox {
     bool hadError = false;
@@ -13,8 +15,10 @@ namespace cpplox {
 
     void run(std::string source) {
         Scanner scanner(std::move(source));
-        std::vector<Token> &tokens = scanner.scanTokens();
+        std::vector<Token> tokens = scanner.scanTokens();
 
+        Parser parser(std::move(tokens));
+        parser.parse();
     }
 
     void runFile(const char *path) {
@@ -39,6 +43,14 @@ namespace cpplox {
 
     void error(int line, const std::string &message) {
         report(line, "", message);
+    }
+
+    void error(Token& token, const std::string &message) {
+        if (token.type == TokenType::END) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
     }
 
 }
