@@ -129,36 +129,36 @@ namespace cpplox {
         return new Class(name, superclass, methods);
     }
 
-    Token &Parser::consume(TokenType type, std::string message) {
+    Token &Parser::consume(TokenType type, const std::string& message) {
         if (check(type)) return advance();
         throw error(peek(), message);
     }
 
-    ParseError Parser::error(Token &token, std::string message) {
+    ParseError Parser::error(Token &token, const std::string& message) {
         cpplox::error(token, message);
         return ParseError{};
     }
 
-    Function *Parser::function(std::string kind) {
+    Function *Parser::function(const std::string& kind) {
         Token &name = consume(TokenType::IDENTIFIER, "Expect " + kind + " name.");
 
         consume(TokenType::LEFT_PAREN, "Expect '(' after " + kind + " name.");
-        std::vector<Token> parameters;
+        auto *parameters = new std::vector<Token>();
 
         if (!check(TokenType::RIGHT_PAREN)) {
             do {
-                if (parameters.size() >= 255) {
+                if (parameters->size() >= 255) {
                     error(peek(), "Can't have more than 255 parameters.");
                 }
 
-                parameters.push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
+                parameters->push_back(consume(TokenType::IDENTIFIER, "Expect parameter name."));
             } while (match(std::vector<TokenType>{TokenType::COMMA}));
         }
         consume(TokenType::RIGHT_PAREN, "Expect ')' after parameters.");
 
         consume(TokenType::LEFT_BRACE, "Expect '{' before " + kind + " body.");
         std::vector<Stmt *> body = block();
-        return new Function(name, std::move(parameters), body);
+        return new Function(name, parameters, body);
     }
 
     std::vector<Stmt *> Parser::block() {
@@ -337,7 +337,7 @@ namespace cpplox {
             return new Literal(nullptr);
 
         if (match(std::vector<TokenType>{TokenType::NUMBER, TokenType::STRING})) {
-            return new Literal(previous().literal);
+            return new Literal(previous().literal->clone());
         }
 
         if (match(std::vector<TokenType>{TokenType::SUPER})) {

@@ -50,11 +50,11 @@ namespace cpplox {
 
         Stmt* classDeclaration();
 
-        Token& consume(TokenType type, std::string message);
+        Token& consume(TokenType type, const std::string& message);
 
-        ParseError error(Token& token, std::string message);
+        ParseError error(Token& token, const std::string& message);
 
-        Function* function(std::string kind);
+        Function* function(const std::string& kind);
 
         std::vector<Stmt*> block();
 

@@ -18,7 +18,16 @@ namespace cpplox {
         std::vector<Token> tokens = scanner.scanTokens();
 
         Parser parser(std::move(tokens));
-        parser.parse();
+        std::vector<Stmt *> statements = parser.parse();
+
+        if (hadError) return;
+
+
+
+        // 析构树
+        for (auto statement: statements) {
+            delete statement;
+        }
     }
 
     void runFile(const char *path) {
@@ -45,7 +54,7 @@ namespace cpplox {
         report(line, "", message);
     }
 
-    void error(Token& token, const std::string &message) {
+    void error(Token &token, const std::string &message) {
         if (token.type == TokenType::END) {
             report(token.line, " at end", message);
         } else {

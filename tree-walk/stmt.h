@@ -31,69 +31,57 @@ namespace cpplox {
 
     class While;
 
-    class Visitor {
-    public:
-        virtual Object *visitBlockStmt(Block *stmt) = 0;
+    namespace stmt {
+        class Visitor {
+        public:
+            virtual Object *visitBlockStmt(Block *stmt) = 0;
 
-        virtual Object *visitClassStmt(Class *stmt) = 0;
+            virtual Object *visitClassStmt(Class *stmt) = 0;
 
-        virtual Object *visitExpressionStmt(Expression *stmt) = 0;
+            virtual Object *visitExpressionStmt(Expression *stmt) = 0;
 
-        virtual Object *visitFunctionStmt(Function *stmt) = 0;
+            virtual Object *visitFunctionStmt(Function *stmt) = 0;
 
-        virtual Object *visitIfStmt(If *stmt) = 0;
+            virtual Object *visitIfStmt(If *stmt) = 0;
 
-        virtual Object *visitPrintStmt(Print *stmt) = 0;
+            virtual Object *visitPrintStmt(Print *stmt) = 0;
 
-        virtual Object *visitReturnStmt(Return *stmt) = 0;
+            virtual Object *visitReturnStmt(Return *stmt) = 0;
 
-        virtual Object *visitVarStmt(Var *stmt) = 0;
+            virtual Object *visitVarStmt(Var *stmt) = 0;
 
-        virtual Object *visitWhileStmt(While *stmt) = 0;
-    };
+            virtual Object *visitWhileStmt(While *stmt) = 0;
+        };
+    }
+
 
     class Stmt {
     public:
-        virtual Object *accept(Visitor *visitor) = 0;
+        virtual Object *accept(stmt::Visitor *visitor) = 0;
 
         virtual ~Stmt() = default;
     };
 
+
     class Block : public Stmt {
     private:
-        std::vector<Stmt*> statements;
+        std::vector<Stmt *> statements;
     public:
-        explicit Block(std::vector<Stmt*> statements) {
+        explicit Block(std::vector<Stmt *> statements) {
             this->statements = std::move(statements);
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitBlockStmt(this);
         }
 
-        ~Block() override = default;
-    };
-
-    class Class : public Stmt {
-    private:
-        Token name;
-        Variable *superclass;
-        std::vector<Function*> methods;
-    public:
-        Class(Token& name, Variable *superclass, std::vector<Function*> methods) {
-            this->name = name;
-            this->superclass = superclass;
-            this->methods = std::move(methods);
-        }
-
-        Object *accept(Visitor *visitor) override {
-            return visitor->visitClassStmt(this);
-        }
-
-        ~Class() override {
-            delete superclass;
+        ~Block() override {
+            for (auto statement: statements) {
+                delete statement;
+            }
         };
     };
+
 
     class Expression : public Stmt {
     private:
@@ -103,7 +91,7 @@ namespace cpplox {
             this->expression = expression;
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitExpressionStmt(this);
         }
 
@@ -116,22 +104,50 @@ namespace cpplox {
     class Function : public Stmt {
     private:
         Token name;
-        std::vector<Token> params;
-        std::vector<Stmt*> body;
+        std::vector<Token> *params;
+        std::vector<Stmt *> body;
     public:
-        Function(Token& name, std::vector<Token> params, std::vector<Stmt*> body) {
+        Function(Token &name, std::vector<Token> *params, std::vector<Stmt *> body) {
             this->name = name;
-            this->params = std::move(params);
+            this->params = params;
             this->body = std::move(body);
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitFunctionStmt(this);
         }
 
-        ~Function() override = default;
+        ~Function() override {
+            delete params;
+            for (auto statement: body) {
+                delete statement;
+            }
+        };
     };
 
+    class Class : public Stmt {
+    private:
+        Token name;
+        Variable *superclass;
+        std::vector<Function *> methods;
+    public:
+        Class(Token &name, Variable *superclass, std::vector<Function *> methods) {
+            this->name = name;
+            this->superclass = superclass;
+            this->methods = std::move(methods);
+        }
+
+        Object *accept(stmt::Visitor *visitor) override {
+            return visitor->visitClassStmt(this);
+        }
+
+        ~Class() override {
+            delete superclass;
+            for (auto method: methods) {
+                delete method;
+            }
+        };
+    };
 
     class If : public Stmt {
     private:
@@ -145,7 +161,7 @@ namespace cpplox {
             this->elseBranch = elseBranch;
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitIfStmt(this);
         }
 
@@ -165,7 +181,7 @@ namespace cpplox {
             this->expression = expression;
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitPrintStmt(this);
         }
 
@@ -179,12 +195,12 @@ namespace cpplox {
         Token keyword;
         Expr *value;
     public:
-        Return(Token& keyword, Expr *value) {
+        Return(Token &keyword, Expr *value) {
             this->keyword = keyword;
             this->value = value;
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitReturnStmt(this);
         }
 
@@ -198,12 +214,12 @@ namespace cpplox {
         Token name;
         Expr *initializer;
     public:
-        Var(Token& name, Expr *initializer) {
+        Var(Token &name, Expr *initializer) {
             this->name = name;
             this->initializer = initializer;
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitVarStmt(this);
         }
 
@@ -223,7 +239,7 @@ namespace cpplox {
             this->body = body;
         }
 
-        Object *accept(Visitor *visitor) override {
+        Object *accept(stmt::Visitor *visitor) override {
             return visitor->visitWhileStmt(this);
         }
 

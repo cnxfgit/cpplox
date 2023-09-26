@@ -6,6 +6,7 @@
 #define CPPLOX_EXPR_H
 
 #include "token.h"
+#include <vector>
 
 namespace cpplox {
 
@@ -74,7 +75,7 @@ namespace cpplox {
         Token name;
         Expr *value;
     public:
-        Assign(Token& name, Expr *value) {
+        Assign(Token &name, Expr *value) {
             this->name = name;
             this->value = value;
         }
@@ -95,7 +96,7 @@ namespace cpplox {
         Expr *right;
 
     public:
-        Binary(Expr *left, Token& op, Expr *right) {
+        Binary(Expr *left, Token &op, Expr *right) {
             this->left = left;
             this->op = op;
             this->right = right;
@@ -117,7 +118,7 @@ namespace cpplox {
         Token paren;
         std::vector<Expr *> arguments;
     public:
-        Call(Expr *callee, Token& paren, std::vector<Expr *> arguments) {
+        Call(Expr *callee, Token &paren, std::vector<Expr *> arguments) {
             this->callee = callee;
             this->paren = paren;
             this->arguments = std::move(arguments);
@@ -129,12 +130,15 @@ namespace cpplox {
 
         ~Call() override {
             delete callee;
+            for (auto argument: arguments) {
+                delete argument;
+            }
         }
     };
 
     class Get : public Expr {
     public:
-        Get(Expr *object, Token& name) {
+        Get(Expr *object, Token &name) {
             this->object = object;
             this->name = name;
         }
@@ -153,9 +157,9 @@ namespace cpplox {
 
     class Grouping : public Expr {
     private:
-        Expr* expression;
+        Expr *expression;
     public:
-        explicit Grouping(Expr* expression) {
+        explicit Grouping(Expr *expression) {
             this->expression = expression;
         }
 
@@ -191,7 +195,7 @@ namespace cpplox {
         Token op;
         Expr *right;
     public:
-        Logical(Expr *left, Token& op, Expr *right) {
+        Logical(Expr *left, Token &op, Expr *right) {
             this->left = left;
             this->op = op;
             this->right = right;
@@ -234,7 +238,7 @@ namespace cpplox {
         Token keyword;
         Token method;
     public:
-        Super(Token& keyword, Token& method) {
+        Super(Token &keyword, Token &method) {
             this->keyword = keyword;
             this->method = method;
         }
@@ -250,8 +254,8 @@ namespace cpplox {
     private:
         Token keyword;
     public:
-        explicit This(Token keyword) {
-            this->keyword = std::move(keyword);
+        explicit This(Token& keyword) {
+            this->keyword = keyword;
         }
 
         Object *accept(expr::Visitor *visitor) override {
@@ -266,7 +270,7 @@ namespace cpplox {
         Token op;
         Expr *right;
     public:
-        Unary(Token& op, Expr *right) {
+        Unary(Token &op, Expr *right) {
             this->op = op;
             this->right = right;
         }

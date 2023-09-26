@@ -52,6 +52,8 @@ namespace cpplox {
         if (this != &other) {
             if (other.literal != nullptr) {
                 this->literal = other.literal->clone();
+            } else {
+                this->literal = nullptr;
             }
             this->lexeme = other.lexeme;
             this->line = other.line;
@@ -63,6 +65,8 @@ namespace cpplox {
     Token::Token(const Token &other) noexcept {
         if (other.literal != nullptr) {
             this->literal = other.literal->clone();
+        } else {
+            this->literal = nullptr;
         }
         this->lexeme = other.lexeme;
         this->line = other.line;
