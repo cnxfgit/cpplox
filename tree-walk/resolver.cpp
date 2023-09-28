@@ -244,7 +244,8 @@ namespace cpplox {
     }
 
     Object *Resolver::visitVariableExpr(Variable *expr) {
-        if (!scopes.empty() && !scopes.back()[expr->name.lexeme]) {
+        if (!scopes.empty() && scopes.back().find(expr->name.lexeme) != scopes.back().end()
+            && !scopes.back()[expr->name.lexeme]) {
             error(expr->name, "Can't read local variable in its own initializer.");
         }
 

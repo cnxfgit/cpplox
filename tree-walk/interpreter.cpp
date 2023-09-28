@@ -54,7 +54,9 @@ namespace cpplox {
             for (Stmt *statement: statements) {
                 execute(statement);
             }
-        } catch (std::exception &e) {
+        } catch (ReturnException &e) {
+            this->environment = previous;
+            throw e;
         }
         this->environment = previous;
     }
@@ -177,8 +179,8 @@ namespace cpplox {
     Object *Interpreter::visitAssignExpr(Assign *expr) {
         Object *value = evaluate(expr->value);
 
-        int distance = locals[expr];
         if (locals.find(expr) != locals.end()) {
+            int distance = locals[expr];
             environment->assignAt(distance, expr->name, value);
         } else {
             globals->assign(expr->name, value);
@@ -330,8 +332,8 @@ namespace cpplox {
     }
 
     Object *Interpreter::lookUpVariable(Token &name, Expr *expr) {
-        int distance = locals[expr];
         if (locals.find(expr) != locals.end()) {
+            int distance = locals[expr];
             return environment->getAt(distance, name.lexeme);
         } else {
             return globals->get(name);

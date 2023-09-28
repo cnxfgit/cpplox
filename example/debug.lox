@@ -1,1 +1,5 @@
-2 + 10;
+var global = "outside";
+{
+  var local = "inside";
+  print global + local;
+}
