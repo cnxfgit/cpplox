@@ -64,8 +64,6 @@ namespace cpplox {
 
 
     class Block : public Stmt {
-    private:
-        std::vector<Stmt *> statements;
     public:
         explicit Block(std::vector<Stmt *> statements) {
             this->statements = std::move(statements);
@@ -80,12 +78,11 @@ namespace cpplox {
                 delete statement;
             }
         };
+        std::vector<Stmt *> statements;
     };
 
 
     class Expression : public Stmt {
-    private:
-        Expr *expression;
     public:
         explicit Expression(Expr *expression) {
             this->expression = expression;
@@ -98,14 +95,11 @@ namespace cpplox {
         ~Expression() override {
             delete expression;
         };
+        Expr *expression;
     };
 
 
     class Function : public Stmt {
-    private:
-        Token name;
-        std::vector<Token> *params;
-        std::vector<Stmt *> body;
     public:
         Function(Token &name, std::vector<Token> *params, std::vector<Stmt *> body) {
             this->name = name;
@@ -123,13 +117,12 @@ namespace cpplox {
                 delete statement;
             }
         };
+        std::vector<Stmt *> body;
+        std::vector<Token> *params;
+        Token name;
     };
 
     class Class : public Stmt {
-    private:
-        Token name;
-        Variable *superclass;
-        std::vector<Function *> methods;
     public:
         Class(Token &name, Variable *superclass, std::vector<Function *> methods) {
             this->name = name;
@@ -147,13 +140,12 @@ namespace cpplox {
                 delete method;
             }
         };
+        Token name;
+        Variable *superclass;
+        std::vector<Function *> methods;
     };
 
     class If : public Stmt {
-    private:
-        Expr *condition;
-        Stmt *thenBranch;
-        Stmt *elseBranch;
     public:
         If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch) {
             this->condition = condition;
@@ -170,12 +162,13 @@ namespace cpplox {
             delete thenBranch;
             delete elseBranch;
         };
+        Expr *condition;
+        Stmt *thenBranch;
+        Stmt *elseBranch;
     };
 
 
     class Print : public Stmt {
-    private:
-        Expr *expression;
     public:
         explicit Print(Expr *expression) {
             this->expression = expression;
@@ -188,12 +181,10 @@ namespace cpplox {
         ~Print() override {
             delete expression;
         };
+        Expr *expression;
     };
 
     class Return : public Stmt {
-    private:
-        Token keyword;
-        Expr *value;
     public:
         Return(Token &keyword, Expr *value) {
             this->keyword = keyword;
@@ -207,12 +198,11 @@ namespace cpplox {
         ~Return() override {
             delete value;
         };
+        Token keyword;
+        Expr *value;
     };
 
     class Var : public Stmt {
-    private:
-        Token name;
-        Expr *initializer;
     public:
         Var(Token &name, Expr *initializer) {
             this->name = name;
@@ -226,13 +216,12 @@ namespace cpplox {
         ~Var() override {
             delete initializer;
         };
+        Token name;
+        Expr *initializer;
     };
 
 
     class While : public Stmt {
-    private:
-        Expr *condition;
-        Stmt *body;
     public:
         While(Expr *condition, Stmt *body) {
             this->condition = condition;
@@ -247,6 +236,8 @@ namespace cpplox {
             delete condition;
             delete body;
         };
+        Expr *condition;
+        Stmt *body;
     };
 
 }
