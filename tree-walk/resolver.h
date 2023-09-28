@@ -28,11 +28,13 @@ namespace cpplox {
 
     class Resolver : public expr::Visitor, public stmt::Visitor {
     private:
-        Interpreter interpreter;
+        Interpreter *interpreter;
         std::deque<std::map<std::string, bool>> scopes;
         FunctionType currentFunction = FunctionType::NONE;
         ClassType currentClass = ClassType::NONE;
     public:
+        explicit Resolver(Interpreter *interpreter);
+
         void resolve(const std::vector<Stmt *> &statements);
 
     private:

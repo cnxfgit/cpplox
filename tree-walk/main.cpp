@@ -8,10 +8,13 @@
 #include "scanner.h"
 #include "parser.h"
 #include "token.h"
+#include "resolver.h"
 
 namespace cpplox {
     bool hadError = false;
     bool hadRuntimeError = false;
+
+    Interpreter *interpreter = new Interpreter();
 
     void run(std::string source) {
         Scanner scanner(std::move(source));
@@ -22,7 +25,12 @@ namespace cpplox {
 
         if (hadError) return;
 
+        Resolver resolver(interpreter);
+        resolver.resolve(statements);
 
+        if (hadError) return;
+
+        interpreter->interpret(statements);
 
         // 析构树
         for (auto statement: statements) {
@@ -62,6 +70,11 @@ namespace cpplox {
         }
     }
 
+    void runtimeError(RuntimeError &error) {
+        std::cerr << error.message + "\n[line " + std::to_string(error.token.line) + "]" << std::endl;
+        hadRuntimeError = true;
+    }
+
 }
 
 int main(int argc, char *argv[]) {
@@ -73,6 +86,7 @@ int main(int argc, char *argv[]) {
     } else {
         cpplox::runPrompt();
     }
+    delete cpplox::interpreter;
     return 0;
 }
 

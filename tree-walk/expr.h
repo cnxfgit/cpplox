@@ -90,8 +90,6 @@ namespace cpplox {
     };
 
     class Binary : public Expr {
-    private:
-        Token op;
 
     public:
         Binary(Expr *left, Token &op, Expr *right) {
@@ -111,11 +109,10 @@ namespace cpplox {
 
         Expr *left;
         Expr *right;
+        Token op;
     };
 
     class Call : public Expr {
-    private:
-        Token paren;
     public:
         Call(Expr *callee, Token &paren, std::vector<Expr *> arguments) {
             this->callee = callee;
@@ -136,6 +133,7 @@ namespace cpplox {
 
         std::vector<Expr *> arguments;
         Expr *callee;
+        Token paren;
     };
 
     class Get : public Expr {
@@ -174,8 +172,6 @@ namespace cpplox {
     };
 
     class Literal : public Expr {
-    private:
-        Object *value;
     public:
         explicit Literal(Object *value) {
             this->value = value;
@@ -188,11 +184,11 @@ namespace cpplox {
         ~Literal() override {
             delete value;
         }
+
+        Object *value;
     };
 
     class Logical : public Expr {
-    private:
-        Token op;
     public:
         Logical(Expr *left, Token &op, Expr *right) {
             this->left = left;
@@ -211,11 +207,10 @@ namespace cpplox {
 
         Expr *left;
         Expr *right;
+        Token op;
     };
 
     class Set : public Expr {
-    private:
-        Token name;
     public:
         Set(Expr *object, Token name, Expr *value) {
             this->object = object;
@@ -234,11 +229,10 @@ namespace cpplox {
 
         Expr *value;
         Expr *object;
+        Token name;
     };
 
     class Super : public Expr {
-    private:
-        Token method;
     public:
         Super(Token &keyword, Token &method) {
             this->keyword = keyword;
@@ -252,6 +246,7 @@ namespace cpplox {
         ~Super() override = default;
 
         Token keyword;
+        Token method;
     };
 
     class This : public Expr {
@@ -270,8 +265,6 @@ namespace cpplox {
     };
 
     class Unary : public Expr {
-    private:
-        Token op;
     public:
         Unary(Token &op, Expr *right) {
             this->op = op;
@@ -286,6 +279,7 @@ namespace cpplox {
             delete right;
         };
         Expr *right;
+        Token op;
     };
 
     class Variable : public Expr {

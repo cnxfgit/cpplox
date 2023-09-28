@@ -38,17 +38,17 @@ namespace cpplox {
         Object *literal;
         int line;
 
-        Token();
+        Token() noexcept;
 
-        Token(TokenType type, std::string lexeme, Object *literal, int line);
+        Token(TokenType type, std::string lexeme, Object *literal, int line) noexcept;
 
         Token(Token &&other) noexcept;
 
         Token(const Token &other) noexcept;
 
-        Token& operator=(Token &&other) noexcept;
+        Token &operator=(Token &&other) noexcept;
 
-        Token& operator=(const Token &other) noexcept;
+        Token &operator=(const Token &other) noexcept;
 
         ~Token();
     };

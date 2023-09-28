@@ -7,38 +7,40 @@
 
 #include <string>
 
-namespace cpplox{
+namespace cpplox {
     class Object {
     public:
         virtual std::string toString() = 0;
 
-        virtual Object* clone() = 0;
+        virtual Object *clone() = 0;
 
         virtual ~Object() = default;
     };
 
     class Boolean : public Object {
-        bool value;
     public:
+        bool value;
+
         explicit Boolean(bool value);
 
         std::string toString() override;
 
-        Object* clone() override;
+        Object *clone() override;
 
         ~Boolean() override;
     };
 
     class Number : public Object {
-        double value;
     public:
         explicit Number(double value);
 
         std::string toString() override;
 
-        Object* clone() override;
+        Object *clone() override;
 
         ~Number() override;
+
+        double value;
     };
 
     class String : public Object {
@@ -48,10 +50,12 @@ namespace cpplox{
 
         std::string toString() override;
 
-        Object* clone() override;
+        Object *clone() override;
 
         ~String() override;
     };
+
+
 }
 
 #endif //CPPLOX_OBJECT_H

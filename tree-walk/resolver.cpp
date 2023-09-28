@@ -40,7 +40,7 @@ namespace cpplox {
     void Resolver::resolveLocal(Expr *expr, Token &name) {
         for (int i = (int) scopes.size() - 1; i >= 0; i--) {
             if (scopes[i].find(name.lexeme) != scopes[i].end()) {
-                interpreter.resolve(expr, (int) scopes.size() - 1 - i);
+                interpreter->resolve(expr, (int) scopes.size() - 1 - i);
                 return;
             }
         }
@@ -250,5 +250,9 @@ namespace cpplox {
 
         resolveLocal(expr, expr->name);
         return nullptr;
+    }
+
+    Resolver::Resolver(Interpreter *interpreter) {
+        this->interpreter = interpreter;
     }
 }

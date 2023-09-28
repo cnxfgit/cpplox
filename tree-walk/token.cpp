@@ -7,7 +7,7 @@
 
 namespace cpplox {
 
-    Token::Token(TokenType type, std::string lexeme, Object *literal, int line) {
+    Token::Token(TokenType type, std::string lexeme, Object *literal, int line) noexcept {
         this->type = type;
         this->lexeme = std::move(lexeme);
         this->literal = literal;
@@ -41,7 +41,7 @@ namespace cpplox {
         return *this;
     }
 
-    Token::Token() {
+    Token::Token() noexcept {
         this->literal = nullptr;
         this->lexeme = std::string();
         this->type = TokenType::NIL;
