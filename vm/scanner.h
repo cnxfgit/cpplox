@@ -7,7 +7,7 @@
 
 namespace cpplox{
 // 令牌类型枚举
-    typedef enum {
+     enum TokenType{
         // 单字符标记
         TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
         TOKEN_LEFT_BRACE, TOKEN_RIGHT_BRACE,
@@ -27,16 +27,16 @@ namespace cpplox{
         TOKEN_TRUE, TOKEN_VAR, TOKEN_WHILE,
         // 错误令牌或者结束符
         TOKEN_ERROR, TOKEN_EOF
-    } TokenType;
+    } ;
 
 
 // 词法令牌
-    typedef struct {
+     struct Token{
         TokenType type;     // 令牌类型
         const char* start;  // 起点指针
         int length;         // 长度
         int line;           // 行号
-    } Token;
+    } ;
 
 // 初始化扫描仪
     void initScanner(const char* source);

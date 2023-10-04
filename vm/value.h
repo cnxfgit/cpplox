@@ -11,8 +11,8 @@
 namespace cpplox{
 
 
-    typedef struct Obj Obj;
-    typedef struct ObjString ObjString;
+     struct Obj ;
+     struct ObjString ;
 
 #ifdef NAN_BOXING
 
@@ -60,22 +60,22 @@ namespace cpplox{
 
 
     // 值类型
-typedef enum {
+ enum ValueType{
     VAL_BOOL,   // 布尔类型
     VAL_NIL,    // 空类型
     VAL_NUMBER, // 数字类型
     VAL_OBJ     // 对象类型
-} ValueType;
+} ;
 
 // 基础值
-typedef struct {
+ struct Value{
     ValueType type;         // 值类型
     union {
         bool boolean;       // 布尔类型
         double number;      // 数字类型
         Obj* obj;           // 对象指针
     } as;                   // 类型联合体
-} Value;
+} ;
 
 // 判断值是否为布尔
 #define IS_BOOL(value)    ((value).type == VAL_BOOL)
@@ -106,11 +106,11 @@ typedef struct {
 #endif
 
 // 常量数组
-    typedef struct {
+     struct ValueArray{
         int capacity;   // 常量数组当前容量
         int count;      // 常量数组当前长度
         Value* values;  // 常量数组
-    } ValueArray;
+    } ;
 
 // 比较两值是否相等
     bool valuesEqual(Value a, Value b);

@@ -19,14 +19,14 @@ namespace cpplox{
 #define STACK_MAX (FRAMES_MAX * UINT8_COUNT)
 
 // 调用帧
-    typedef struct {
+    struct CallFrame {
         ObjClosure* closure;        // 调用的函数闭包
         uint8_t* ip;                // 指向字节码数组的指针 指函数执行到哪了
         Value* slots;               // 指向vm栈中该函数使用的第一个局部变量
-    } CallFrame;
+    } ;
 
 // 虚拟机
-    typedef struct {
+    struct VM{
         CallFrame frames[FRAMES_MAX];   // 栈帧数组 所有函数调用的执行点
         int frameCount;                 // 当前调用栈数
 
@@ -44,13 +44,13 @@ namespace cpplox{
         int grayCount;                  // 灰色对象数量
         int grayCapacity;               // 灰色对象容量
         Obj** grayStack;                // 灰色对象栈
-    } VM;
+    } ;
 
-    typedef enum {
+    enum InterpretResult {
         INTERPRET_OK,               // 解释执行成功
         INTERPRET_COMPILE_ERROR,    // 编译期异常
         INTERPRET_RUNTIME_ERROR     // 运行时异常
-    } InterpretResult;
+    } ;
 
     extern VM vm;
 

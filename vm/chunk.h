@@ -10,7 +10,7 @@
 
 namespace cpplox{
     //  字节操作码
-    typedef enum {
+     enum OpCode{
         OP_CONSTANT,        // 写入常量
         OP_NIL,             // 空指令 nil
         OP_TRUE,            // true指令
@@ -48,16 +48,16 @@ namespace cpplox{
         OP_CLASS,           // 类指令
         OP_INHERIT,         // 继承指令
         OP_METHOD           // 方法指令
-    } OpCode;
+    } ;
 
     // 字节码块
-    typedef struct {
+     struct Chunk {
         int count;              // 字节码数组当前长度
         int capacity;           // 字节码数组当前总容量
         uint8_t* code;          // 字节码数组
         int* lines;             // 源码行号
         ValueArray constants;   // 字节码块常量数组
-    } Chunk;
+    } ;
 
     // 初始化字节码块
     void initChunk(Chunk* chunk);

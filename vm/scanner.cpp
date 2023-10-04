@@ -10,11 +10,11 @@ namespace cpplox{
 
 
 // 单例扫描仪
-    typedef struct {
+     struct Scanner{
         const char *start;      // 指向起点的指针
         const char *current;    // 指向当前的指针
         int line;               // 行号
-    } Scanner;
+    } ;
 
     Scanner scanner;
 

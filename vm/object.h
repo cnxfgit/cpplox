@@ -48,7 +48,7 @@ namespace cpplox{
 #define AS_CSTRING(value)      (((ObjString*)AS_OBJ(value))->chars)
 
 // 对象类型枚举
-    typedef enum {
+    enum ObjType{
         OBJ_BOUND_METHOD,   // 绑定方法对象
         OBJ_CLASS,          // 类对象
         OBJ_CLOSURE,        // 闭包对象
@@ -57,7 +57,7 @@ namespace cpplox{
         OBJ_NATIVE,         // 原生函数对象
         OBJ_STRING,         // 字符串对象
         OBJ_UPVALUE,        // 闭包提升值对象
-    } ObjType;
+    } ;
 
 // 对象结构体
     struct Obj {
@@ -67,22 +67,22 @@ namespace cpplox{
     };
 
 // 函数对象结构体
-    typedef struct {
+     struct ObjFunction{
         Obj obj;            // 公共对象头
         int arity;          // 参数数
         int upvalueCount;   // 提升值数
         Chunk chunk;        // 函数的字节码块
         ObjString *name;    // 函数名
-    } ObjFunction;
+    } ;
 
 // 原生函数 函数指针
     typedef Value (*NativeFn)(int argCount, Value *args);
 
 // 原生函数对象
-    typedef struct {
+     struct ObjNative{
         Obj obj;            // 公共对象头
         NativeFn function;  // 原生函数指针
-    } ObjNative;
+    } ;
 
 // 字符串对象结构体
     struct ObjString {
@@ -93,41 +93,41 @@ namespace cpplox{
     };
 
 // 提升值
-    typedef struct ObjUpvalue {
+     struct ObjUpvalue{
         Obj obj;                    // 公共对象头
         Value *location;            // 捕获的局部变量
         Value closed;               //
         struct ObjUpvalue *next;    // next指针
-    } ObjUpvalue;
+    } ;
 
 // 闭包对象
-    typedef struct {
+     struct ObjClosure{
         Obj obj;                    // 公共对象头
         ObjFunction *function;      // 裸函数
         ObjUpvalue **upvalues;      // 提升值数组
         int upvalueCount;           // 提升值数量
-    } ObjClosure;
+    } ;
 
 // 类对象
-    typedef struct {
+     struct ObjClass{
         Obj obj;                // 公共对象头
         ObjString *name;        // 类名
         Table methods;          // 类方法
-    } ObjClass;
+    } ;
 
 // 实例对象
-    typedef struct {
+     struct ObjInstance{
         Obj obj;
         ObjClass *klass;
         Table fields;
-    } ObjInstance;
+    } ;
 
 // 绑定方法对象
-    typedef struct {
+     struct ObjBoundMethod{
         Obj obj;
         Value receiver;
         ObjClosure *method;
-    } ObjBoundMethod;
+    } ;
 
 // 新建方法
     ObjBoundMethod *newBoundMethod(Value receiver, ObjClosure *method);

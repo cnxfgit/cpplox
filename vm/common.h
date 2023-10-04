@@ -11,7 +11,7 @@
 
 namespace cpplox {
 // NAN 装箱
-#define NAN_BOXING
+//#define NAN_BOXING
 
 // 无异常反汇编当前字节码块
 #define DEBUG_PRINT_CODE
