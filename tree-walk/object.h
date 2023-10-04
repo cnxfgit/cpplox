@@ -15,6 +15,8 @@ namespace cpplox {
         virtual Object *clone() = 0;
 
         virtual ~Object() = default;
+
+        bool operator==(Object* other);
     };
 
     class Boolean : public Object {
@@ -44,7 +46,6 @@ namespace cpplox {
     };
 
     class String : public Object {
-        std::string value;
     public:
         explicit String(std::string value);
 
@@ -53,6 +54,8 @@ namespace cpplox {
         Object *clone() override;
 
         ~String() override;
+
+        std::string value;
     };
 
 

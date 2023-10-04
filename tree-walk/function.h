@@ -31,7 +31,7 @@ namespace cpplox {
 
         Object * call(Interpreter *interpreter, std::vector<Object *> arguments) override;
 
-        ~LoxFunction() override = default;
+        ~LoxFunction() override;
     };
 
 }

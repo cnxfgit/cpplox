@@ -50,7 +50,22 @@ namespace cpplox {
     }
 
     void runPrompt() {
+        char line[1024];
+        for (; ; ) {
+            printf("> ");
 
+            if (!fgets(line, sizeof(line), stdin)) {
+                printf("\n");
+                break;
+            }
+
+            if (std::string(line).substr(0, 4) == "exit") {
+                break;
+            }
+
+            run(line);
+            hadError = false;
+        }
     }
 
     void report(int line, const std::string &where, const std::string &message) {

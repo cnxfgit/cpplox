@@ -89,6 +89,8 @@ namespace cpplox {
 
         Object *visitWhileStmt(While *stmt) override;
 
+        void removeVariable(const std::string& name);
+
         ~Interpreter();
 
     private:

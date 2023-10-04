@@ -37,7 +37,6 @@ namespace cpplox {
         } catch (ReturnException &returnValue) {
             return returnValue.value;
         }
-
         if (isInitializer) return closure->getAt(0, "this");
         return nullptr;
     }
@@ -46,5 +45,10 @@ namespace cpplox {
         auto environment = new Environment(closure);
         environment->define("this", instance);
         return new LoxFunction(declaration, environment, isInitializer);
+    }
+
+    LoxFunction::~LoxFunction() {
+        delete declaration;
+        delete closure;
     }
 }

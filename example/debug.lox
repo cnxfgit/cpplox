@@ -1,5 +1,6 @@
-var global = "outside";
+//var a = true;
 {
-  var local = "inside";
-  print global + local;
+    var a = true;
 }
+//var b = a;
+//print b;

@@ -4,7 +4,8 @@
 
 #include "object.h"
 
-namespace cpplox{
+namespace cpplox {
+
     Boolean::Boolean(bool value) {
         this->value = value;
     }
@@ -46,4 +47,26 @@ namespace cpplox{
     }
 
     String::~String() = default;
+
+    bool Object::operator==(Object *other) {
+        auto leNum = dynamic_cast<Number*>(this);
+        auto riNum = dynamic_cast<Number*>(other);
+        if (leNum != nullptr && riNum != nullptr) {
+            return leNum->value == riNum->value;
+        }
+
+        auto leBool = dynamic_cast<Boolean*>(this);
+        auto riBool = dynamic_cast<Boolean*>(other);
+        if (leBool != nullptr && riBool != nullptr) {
+            return leBool->value == riBool->value;
+        }
+
+        auto leStr = dynamic_cast<String*>(this);
+        auto riStr = dynamic_cast<String*>(other);
+        if (leStr != nullptr && riStr != nullptr) {
+            return leStr->value == riStr->value;
+        }
+
+        return this == other;
+    }
 }
