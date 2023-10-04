@@ -34,56 +34,57 @@ namespace cpplox{
         initValueArray(array);
     }
 
-    void printValue(Value value) {
+    void Value::print() {
 #ifdef NAN_BOXING
-        if (IS_BOOL(value)) {
-            printf(AS_BOOL(value) ? "true" : "false");
-        } else if (IS_NIL(value)) {
+        if (IS_BOOL((*this))) {
+            printf(AS_BOOL((*this)) ? "true" : "false");
+        } else if (IS_NIL((*this))) {
             printf("nil");
-        } else if (IS_NUMBER(value)) {
-            printf("%g", AS_NUMBER(value));
-        } else if (IS_OBJ(value)) {
-            printObject(value);
+        } else if (IS_NUMBER((*this))) {
+            printf("%g", AS_NUMBER((*this)));
+        } else if (IS_OBJ((*this))) {
+            printObject((*this));
         }
 #else
-        switch (value.type) {
+        switch (this->type) {
         case VAL_BOOL:
-            printf(AS_BOOL(value) ? "true" : "false");
+            printf(AS_BOOL(*this) ? "true" : "false");
             break;
         case VAL_NIL:
             printf("nil");
             break;
         case VAL_NUMBER:
-            printf("%g", AS_NUMBER(value));
+            printf("%g", AS_NUMBER(*this));
             break;
         case VAL_OBJ:
-            printObject(value);
+            printObject(*this);
             break;
     }
 #endif
     }
 
-    bool valuesEqual(Value a, Value b) {
+    bool Value::operator==(const Value &other) const {
 #ifdef NAN_BOXING
-        if (IS_NUMBER(a) && IS_NUMBER(b)) {
-            return AS_NUMBER(a) == AS_NUMBER(b);
+        if (IS_NUMBER((*this)) && IS_NUMBER(other)) {
+            return AS_NUMBER((*this)) == AS_NUMBER(other);
         }
-        return a == b;
+        return this->v == other.v;
 #else
-        if (a.type != b.type) return false;
-    switch (a.type) {
+        if (this->type != other.type) return false;
+    switch (this->type) {
         case VAL_BOOL:
-            return AS_BOOL(a) == AS_BOOL(b);
+            return AS_BOOL(*this) == AS_BOOL(other);
         case VAL_NIL:
             return true;
         case VAL_NUMBER:
-            return AS_NUMBER(a) == AS_NUMBER(b);
+            return AS_NUMBER(*this) == AS_NUMBER(other);
         case VAL_OBJ: {
-            return AS_OBJ(a) == AS_OBJ(b);
+            return AS_OBJ(*this) == AS_OBJ(other);
         }
         default:
             return false; // Unreachable.
     }
 #endif
+
     }
 }

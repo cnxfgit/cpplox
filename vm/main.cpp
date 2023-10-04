@@ -77,7 +77,7 @@ int main(int argc, const char *argv[]) {
     } else if (argc == 2) {
         cpplox::runFile(argv[1]);   // 文件模式
     } else {
-        fprintf(stderr, "Usage: clox [path]\n");
+        fprintf(stderr, "Usage: cpplox [path]\n");
         exit(64);
     }
 
