@@ -9,7 +9,7 @@
 #include "chunk.h"
 #include "table.h"
 
-namespace cpplox{
+namespace cpplox {
 
 
 // 获取对象类型
@@ -48,7 +48,7 @@ namespace cpplox{
 #define AS_CSTRING(value)      (((ObjString*)AS_OBJ(value))->chars)
 
 // 对象类型枚举
-    enum ObjType{
+    enum ObjType {
         OBJ_BOUND_METHOD,   // 绑定方法对象
         OBJ_CLASS,          // 类对象
         OBJ_CLOSURE,        // 闭包对象
@@ -57,77 +57,78 @@ namespace cpplox{
         OBJ_NATIVE,         // 原生函数对象
         OBJ_STRING,         // 字符串对象
         OBJ_UPVALUE,        // 闭包提升值对象
-    } ;
+    };
 
-// 对象结构体
-    struct Obj {
+    // 对象结构体
+    class Obj {
+    public:
         ObjType type;       // 对象类型
         bool isMarked;      // 是否被标记
         struct Obj *next;   // 下一个对象
     };
 
-// 函数对象结构体
-     struct ObjFunction{
-        Obj obj;            // 公共对象头
+    // 函数对象结构体
+    class ObjFunction : public Obj {
+    public:
         int arity;          // 参数数
         int upvalueCount;   // 提升值数
         Chunk chunk;        // 函数的字节码块
         ObjString *name;    // 函数名
-    } ;
+    };
 
 // 原生函数 函数指针
     typedef Value (*NativeFn)(int argCount, Value *args);
 
 // 原生函数对象
-     struct ObjNative{
-        Obj obj;            // 公共对象头
+    class ObjNative : public Obj {
+    public:
         NativeFn function;  // 原生函数指针
-    } ;
+    };
 
 // 字符串对象结构体
-    struct ObjString {
-        Obj obj;        // 公共对象头
+    class ObjString : public Obj {
+    public:
         int length;     // 字符串长度
         char *chars;    // 字符串指针
         uint32_t hash;  // 哈希值
     };
 
 // 提升值
-     struct ObjUpvalue{
-        Obj obj;                    // 公共对象头
+    class ObjUpvalue : public Obj {
+    public:
         Value *location;            // 捕获的局部变量
         Value closed;               //
         struct ObjUpvalue *next;    // next指针
-    } ;
+    };
 
 // 闭包对象
-     struct ObjClosure{
-        Obj obj;                    // 公共对象头
+    class ObjClosure : public Obj {
+    public:
         ObjFunction *function;      // 裸函数
         ObjUpvalue **upvalues;      // 提升值数组
         int upvalueCount;           // 提升值数量
-    } ;
+    };
 
 // 类对象
-     struct ObjClass{
-        Obj obj;                // 公共对象头
+    class ObjClass : public Obj {
+    public:
         ObjString *name;        // 类名
         Table methods;          // 类方法
-    } ;
+    };
 
 // 实例对象
-     struct ObjInstance{
-        Obj obj;
+    class ObjInstance : public Obj {
+    public:
         ObjClass *klass;
         Table fields;
-    } ;
+    };
 
 // 绑定方法对象
-     struct ObjBoundMethod{
-        Obj obj;
+    class ObjBoundMethod : public Obj {
+    public:
         Value receiver;
         ObjClosure *method;
-    } ;
+    };
 
 // 新建方法
     ObjBoundMethod *newBoundMethod(Value receiver, ObjClosure *method);
