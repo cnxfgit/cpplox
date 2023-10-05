@@ -14,14 +14,13 @@
 
 namespace cpplox{
 
-
-
 // 分配对象
-#define ALLOCATE_OBJ(type, objectType) (type*)allocateObject(sizeof(type), objectType)
+#define ALLOCATE_OBJ(type, objectType) (type*)allocateObject<type>(objectType)
 
-// 分配对象
-    static Obj *allocateObject(size_t size, ObjType type) {
-        Obj *object = (Obj *) reallocate(nullptr, 0, size);
+    // 分配对象
+    template<typename T>
+    static Obj *allocateObject(ObjType type) {
+        Obj *object = reallocate<T>(nullptr, 0, 1);
         object->type = type;
         object->isMarked = false;
 
@@ -30,7 +29,7 @@ namespace cpplox{
         vm.objects = object;
 
 #ifdef DEBUG_LOG_GC
-        printf("%p allocate %zu for %d\n", (void*)object, size, type);
+        printf("%p allocate %zu for %d\n", (void*)object, sizeof(T), type);
 #endif
         return object;
     }

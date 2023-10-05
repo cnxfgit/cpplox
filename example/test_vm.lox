@@ -199,7 +199,7 @@ fun chunk2(){
   counter(); // "2".
 
   var start = clock();
-  fib(20);
+  fib(35);
   var end = clock();
   print "===";
   print end - start;
