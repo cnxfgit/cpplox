@@ -5,6 +5,7 @@
 #ifndef CPPLOX_OBJECT_H
 #define CPPLOX_OBJECT_H
 
+#include <string>
 #include "common.h"
 #include "chunk.h"
 #include "table.h"
@@ -88,8 +89,7 @@ namespace cpplox {
 // 字符串对象结构体
     class ObjString : public Obj {
     public:
-        int length;     // 字符串长度
-        char *chars;    // 字符串指针
+        std::string *chars;
         uint32_t hash;  // 哈希值
     };
 

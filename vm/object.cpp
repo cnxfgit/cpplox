@@ -85,10 +85,9 @@ namespace cpplox{
     }
 
 // 分配字符串
-    static ObjString *allocateString(char *chars, int length, uint32_t hash) {
+    static ObjString *allocateString(char *chars, uint32_t hash) {
         ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
-        string->length = length;
-        string->chars = chars;
+        string->chars = new std::string(chars);
         string->hash = hash;
 
         push(OBJ_VAL(string));
@@ -116,7 +115,7 @@ namespace cpplox{
             return interned;
         }
 
-        return allocateString(chars, length, hash);
+        return allocateString(chars, hash);
     }
 
     ObjString *copyString(const char *chars, int length) {
@@ -128,7 +127,7 @@ namespace cpplox{
         char *heapChars = ALLOCATE(char, length + 1);
         memcpy(heapChars, chars, length);
         heapChars[length] = '\0';
-        return allocateString(heapChars, length, hash);
+        return allocateString(heapChars, hash);
     }
 
     ObjUpvalue *newUpvalue(Value *slot) {
