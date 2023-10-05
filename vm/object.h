@@ -149,10 +149,10 @@ namespace cpplox {
     ObjNative *newNative(NativeFn function);
 
 // 取c字符串成字符串类型
-    ObjString *takeString(char *chars, int length);
+    ObjString *takeString(const std::string& chars);
 
 // 在堆中复制字符创 并返回指针
-    ObjString *copyString(const char *chars, int length);
+    ObjString *copyString(const std::string& chars);
 
 // 新建提升值
     ObjUpvalue *newUpvalue(Value *slot);

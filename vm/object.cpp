@@ -3,7 +3,7 @@
 //
 
 #include <cstdio>
-#include <cstring>
+#include <utility>
 
 #include "memory.h"
 #include "object.h"
@@ -35,14 +35,14 @@ namespace cpplox{
     }
 
     ObjBoundMethod *newBoundMethod(Value receiver, ObjClosure *method) {
-        ObjBoundMethod *bound = ALLOCATE_OBJ(ObjBoundMethod, OBJ_BOUND_METHOD);
+        auto *bound = ALLOCATE_OBJ(ObjBoundMethod, OBJ_BOUND_METHOD);
         bound->receiver = receiver;
         bound->method = method;
         return bound;
     }
 
     ObjClass *newClass(ObjString *name) {
-        ObjClass *klass = ALLOCATE_OBJ(ObjClass, OBJ_CLASS);
+        auto *klass = ALLOCATE_OBJ(ObjClass, OBJ_CLASS);
         klass->name = name;
         initTable(&klass->methods);
         return klass;
@@ -50,12 +50,12 @@ namespace cpplox{
 
     ObjClosure *newClosure(ObjFunction *function) {
         // 统计提升值
-        ObjUpvalue **upvalues = ALLOCATE(ObjUpvalue*, function->upvalueCount);
+        auto **upvalues = ALLOCATE(ObjUpvalue*, function->upvalueCount);
         for (int i = 0; i < function->upvalueCount; i++) {
             upvalues[i] = nullptr;
         }
 
-        ObjClosure *closure = ALLOCATE_OBJ(ObjClosure, OBJ_CLOSURE);
+        auto *closure = ALLOCATE_OBJ(ObjClosure, OBJ_CLOSURE);
         closure->function = function;
         closure->upvalues = upvalues;
         closure->upvalueCount = function->upvalueCount;
@@ -63,7 +63,7 @@ namespace cpplox{
     }
 
     ObjFunction *newFunction() {
-        ObjFunction *function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
+        auto *function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
         function->arity = 0;
         function->upvalueCount = 0;
         function->name = nullptr;
@@ -72,22 +72,22 @@ namespace cpplox{
     }
 
     ObjInstance *newInstance(ObjClass *klass) {
-        ObjInstance *instance = ALLOCATE_OBJ(ObjInstance, OBJ_INSTANCE);
+        auto *instance = ALLOCATE_OBJ(ObjInstance, OBJ_INSTANCE);
         instance->klass = klass;
         initTable(&instance->fields);
         return instance;
     }
 
     ObjNative *newNative(NativeFn function) {
-        ObjNative *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+        auto *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
         native->function = function;
         return native;
     }
 
-// 分配字符串
-    static ObjString *allocateString(char *chars, uint32_t hash) {
-        ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
-        string->chars = new std::string(chars);
+    // 分配字符串
+    static ObjString *allocateString(std::string chars, uint32_t hash) {
+        auto *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
+        string->chars = new std::string(std::move(chars));
         string->hash = hash;
 
         push(OBJ_VAL(string));
@@ -96,42 +96,42 @@ namespace cpplox{
         return string;
     }
 
-// 计算哈希值
-    static uint32_t hashString(const char *key, int length) {
+    // 计算哈希值
+    static uint32_t hashString(std::string key) {
         uint32_t hash = 2166136261u;
-        for (int i = 0; i < length; i++) {
-            hash ^= (uint8_t) key[i];
+        for (char i : key) {
+            hash ^= (uint8_t) i;
             hash *= 16777619;
         }
         return hash;
     }
 
-    ObjString *takeString(char *chars, int length) {
-        uint32_t hash = hashString(chars, length);
+    ObjString *takeString(const std::string& chars) {
+        uint32_t hash = hashString(chars);
         // 如果在全局字符串中匹配到了   则释放这个用全局的字符串
-        ObjString *interned = tableFindString(&vm.strings, chars, length, hash);
+        ObjString *interned = tableFindString(&vm.strings, chars, hash);
         if (interned != nullptr) {
-            FREE_ARRAY(char, chars, length + 1);
+            // 析构char时计算
+            compute(chars.capacity(), 0);
             return interned;
         }
 
         return allocateString(chars, hash);
     }
 
-    ObjString *copyString(const char *chars, int length) {
+    ObjString *copyString(const std::string& chars) {
         // 全局存在则直接用全局的
-        uint32_t hash = hashString(chars, length);
-        ObjString *interned = tableFindString(&vm.strings, chars, length, hash);
+        uint32_t hash = hashString(chars);
+        ObjString *interned = tableFindString(&vm.strings, chars, hash);
         if (interned != nullptr) return interned;
 
-        char *heapChars = ALLOCATE(char, length + 1);
-        memcpy(heapChars, chars, length);
-        heapChars[length] = '\0';
-        return allocateString(heapChars, hash);
+        const std::string& string = chars;
+        compute(0, string.capacity());
+        return allocateString(string, hash);
     }
 
     ObjUpvalue *newUpvalue(Value *slot) {
-        ObjUpvalue *upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
+        auto *upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
         upvalue->closed = NIL_VAL;
         upvalue->location = slot;
         upvalue->next = nullptr;
@@ -144,7 +144,7 @@ namespace cpplox{
             printf("<script>");
             return;
         }
-        printf("<fn %s>", function->name->chars);
+        printf("<fn %s>", function->name->chars->c_str());
     }
 
     void printObject(Value value) {
@@ -153,7 +153,7 @@ namespace cpplox{
                 printFunction(AS_BOUND_METHOD(value)->method->function);
                 break;
             case OBJ_CLASS:
-                printf("%s", AS_CLASS(value)->name->chars);
+                printf("%s", AS_CLASS(value)->name->chars->c_str());
                 break;
             case OBJ_CLOSURE:
                 printFunction(AS_CLOSURE(value)->function);
@@ -163,13 +163,13 @@ namespace cpplox{
                 break;
             case OBJ_INSTANCE:
                 printf("%s instance",
-                       AS_INSTANCE(value)->klass->name->chars);
+                       AS_INSTANCE(value)->klass->name->chars->c_str());
                 break;
             case OBJ_NATIVE:
                 printf("<native fn>");
                 break;
             case OBJ_STRING:
-                printf("%s", AS_CSTRING(value));
+                printf("%s", AS_CSTRING(value)->c_str());
                 break;
             case OBJ_UPVALUE:
                 printf("upvalue");
