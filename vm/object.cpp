@@ -9,10 +9,9 @@
 #include "object.h"
 #include "value.h"
 #include "vm.h"
-#include "table.h"
 
 
-namespace cpplox{
+namespace cpplox {
 
 // 分配对象
 #define ALLOCATE_OBJ(type, objectType) (type*)allocateObject<type>(objectType)
@@ -29,7 +28,7 @@ namespace cpplox{
         vm.objects = object;
 
 #ifdef DEBUG_LOG_GC
-        printf("%p allocate %zu for %d\n", (void*)object, sizeof(T), type);
+        printf("%p allocate %zu for %d\n", (void *) object, sizeof(T), type);
 #endif
         return object;
     }
@@ -44,7 +43,7 @@ namespace cpplox{
     ObjClass *newClass(ObjString *name) {
         auto *klass = ALLOCATE_OBJ(ObjClass, OBJ_CLASS);
         klass->name = name;
-        initTable(&klass->methods);
+        klass->methods = new Table();
         return klass;
     }
 
@@ -74,7 +73,7 @@ namespace cpplox{
     ObjInstance *newInstance(ObjClass *klass) {
         auto *instance = ALLOCATE_OBJ(ObjInstance, OBJ_INSTANCE);
         instance->klass = klass;
-        initTable(&instance->fields);
+        instance->fields = new Table();
         return instance;
     }
 
@@ -85,49 +84,64 @@ namespace cpplox{
     }
 
     // 分配字符串
-    static ObjString *allocateString(std::string chars, uint32_t hash) {
+    static ObjString *allocateString(std::string chars) {
         auto *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
         string->chars = new std::string(std::move(chars));
-        string->hash = hash;
 
         push(OBJ_VAL(string));
-        tableSet(&vm.strings, string, NIL_VAL);
+        vm.strings[string] = NIL_VAL;
         pop();
         return string;
     }
 
-    // 计算哈希值
-    static uint32_t hashString(std::string key) {
-        uint32_t hash = 2166136261u;
-        for (char i : key) {
-            hash ^= (uint8_t) i;
-            hash *= 16777619;
-        }
-        return hash;
-    }
-
-    ObjString *takeString(const std::string& chars) {
-        uint32_t hash = hashString(chars);
+    ObjString *takeString(std::string chars) {
+        ObjString key{};
+        std::string str(std::move(chars));
+        key.chars = &str;
         // 如果在全局字符串中匹配到了   则释放这个用全局的字符串
-        ObjString *interned = tableFindString(&vm.strings, chars, hash);
-        if (interned != nullptr) {
+        auto iter = vm.strings.find(&key);
+        if (iter != vm.strings.end()) {
             // 析构char时计算
-            compute(chars.capacity(), 0);
-            return interned;
+            compute(str.capacity(), 0);
+            return iter->first;
         }
 
-        return allocateString(chars, hash);
+        return allocateString(std::move(str));
     }
 
     ObjString *copyString(const std::string& chars) {
+        ObjString key{};
+        std::string str(chars);
+        key.chars = &str;
         // 全局存在则直接用全局的
-        uint32_t hash = hashString(chars);
-        ObjString *interned = tableFindString(&vm.strings, chars, hash);
-        if (interned != nullptr) return interned;
+        auto iter = vm.strings.find(&key);
+        if (iter != vm.strings.end()) {
+            return iter->first;
+        }
 
-        const std::string& string = chars;
+        std::string string = chars;
         compute(0, string.capacity());
-        return allocateString(string, hash);
+        return allocateString(std::move(string));
+    }
+
+    void markTable(Table *table) {
+        for (auto &item: *table) {
+            markObject(item.first);
+            markValue(item.second);
+        }
+    }
+
+    void tableRemoveWhite(Table *table) {
+        std::vector<ObjString *> toRemove;
+        for (const auto &item: *table) {
+            if (!item.first->isMarked) {
+                toRemove.push_back(item.first);
+            }
+        }
+
+        for (const auto &item: toRemove) {
+            table->erase(item);
+        }
     }
 
     ObjUpvalue *newUpvalue(Value *slot) {
