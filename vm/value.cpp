@@ -8,31 +8,7 @@
 #include "memory.h"
 #include "value.h"
 
-namespace cpplox{
-
-
-    void initValueArray(ValueArray *array) {
-        array->values = nullptr;
-        array->capacity = 0;
-        array->count = 0;
-    }
-
-    void writeValueArray(ValueArray *array, Value value) {
-        if (array->capacity < array->count + 1) {
-            int oldCapacity = array->capacity;
-            array->capacity = GROW_CAPACITY(oldCapacity);
-            array->values = GROW_ARRAY(Value, array->values,
-                                       oldCapacity, array->capacity);
-        }
-
-        array->values[array->count] = value;
-        array->count++;
-    }
-
-    void freeValueArray(ValueArray *array) {
-        FREE_ARRAY(Value, array->values, array->capacity);
-        initValueArray(array);
-    }
+namespace cpplox {
 
     void Value::print() {
 #ifdef NAN_BOXING
@@ -47,19 +23,19 @@ namespace cpplox{
         }
 #else
         switch (this->type) {
-        case VAL_BOOL:
-            printf(AS_BOOL(*this) ? "true" : "false");
-            break;
-        case VAL_NIL:
-            printf("nil");
-            break;
-        case VAL_NUMBER:
-            printf("%g", AS_NUMBER(*this));
-            break;
-        case VAL_OBJ:
-            printObject(*this);
-            break;
-    }
+            case VAL_BOOL:
+                printf(AS_BOOL(*this) ? "true" : "false");
+                break;
+            case VAL_NIL:
+                printf("nil");
+                break;
+            case VAL_NUMBER:
+                printf("%g", AS_NUMBER(*this));
+                break;
+            case VAL_OBJ:
+                printObject(*this);
+                break;
+        }
 #endif
     }
 
@@ -71,20 +47,45 @@ namespace cpplox{
         return this->v == other.v;
 #else
         if (this->type != other.type) return false;
-    switch (this->type) {
-        case VAL_BOOL:
-            return AS_BOOL(*this) == AS_BOOL(other);
-        case VAL_NIL:
-            return true;
-        case VAL_NUMBER:
-            return AS_NUMBER(*this) == AS_NUMBER(other);
-        case VAL_OBJ: {
-            return AS_OBJ(*this) == AS_OBJ(other);
+        switch (this->type) {
+            case VAL_BOOL:
+                return AS_BOOL(*this) == AS_BOOL(other);
+            case VAL_NIL:
+                return true;
+            case VAL_NUMBER:
+                return AS_NUMBER(*this) == AS_NUMBER(other);
+            case VAL_OBJ: {
+                return AS_OBJ(*this) == AS_OBJ(other);
+            }
+            default:
+                return false; // Unreachable.
         }
-        default:
-            return false; // Unreachable.
-    }
 #endif
 
+    }
+
+    ValueArray::ValueArray() {
+        compute(0, sizeof(ValueArray));
+    }
+
+    ValueArray::~ValueArray() {
+        compute(sizeof(ValueArray) + sizeof(Value) * _data.capacity(), 0);
+    }
+
+    void ValueArray::write(Value value) {
+        size_t oldSize = _data.capacity();
+        _data.push_back(value);
+        size_t newSize = _data.capacity();
+        if (oldSize != newSize) {
+            compute(oldSize, newSize);
+        }
+    }
+
+    Value ValueArray::operator[](size_t index) {
+        return _data[index];
+    }
+
+    size_t ValueArray::size() {
+        return _data.size();
     }
 }
