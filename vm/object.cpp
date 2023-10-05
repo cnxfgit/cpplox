@@ -67,7 +67,7 @@ namespace cpplox{
         function->arity = 0;
         function->upvalueCount = 0;
         function->name = nullptr;
-        initChunk(&function->chunk);
+        function->chunk = new Chunk();
         return function;
     }
 

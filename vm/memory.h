@@ -24,10 +24,6 @@ namespace cpplox{
 // 释放对象
 #define FREE(type, pointer) reallocate<type>(pointer, 1, 0)
 
-// 动态数组容量调整 类型 void指针 旧长度 新长度
-#define GROW_ARRAY(type, pointer, oldCount, newCount) \
-    reallocate<type>(pointer, oldCount, newCount)
-
     void compute(size_t oldSize, size_t newSize);
 
     // 重新分配内存 扩容或者缩容 取决于新旧长度的大小

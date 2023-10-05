@@ -77,7 +77,7 @@ namespace cpplox {
         _data.push_back(value);
         size_t newSize = _data.capacity();
         if (oldSize != newSize) {
-            compute(oldSize, newSize);
+            compute(oldSize * sizeof(Value), newSize * sizeof(Value));
         }
     }
 

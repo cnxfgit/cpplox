@@ -72,7 +72,7 @@ namespace cpplox {
     public:
         int arity;          // 参数数
         int upvalueCount;   // 提升值数
-        Chunk chunk;        // 函数的字节码块
+        Chunk *chunk;        // 函数的字节码块
         ObjString *name;    // 函数名
     };
 
