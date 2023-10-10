@@ -5,6 +5,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "chunk.h"
 #include "vm.h"
@@ -21,48 +24,26 @@ namespace cpplox{
                 break;
             }
 
-            interpret(line);
+            vm.interpret(line);
         }
     }
 
     // 读取文件内容
-    static char* readFile(const char* path) {
-        FILE* file = fopen(path, "rb");
-        if (file == nullptr) {
-            fprintf(stderr, "Could not open file \"%s\".\n", path);
-            exit(74);
-        }
+    static std::string readFile(const char* path) {
+        std::ifstream ifs(path);
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
 
-        fseek(file, 0L, SEEK_END);
-        size_t fileSize = ftell(file);
-        rewind(file);
-
-        char* buffer = (char*)malloc(fileSize + 1);
-        if (buffer == nullptr) {
-            fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
-            exit(74);
-        }
-
-        size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
-        if (bytesRead < fileSize) {
-            fprintf(stderr, "Could not read file \"%s\".\n", path);
-            exit(74);
-        }
-
-        buffer[bytesRead] = '\0';
-
-        fclose(file);
-        return buffer;
+        return buffer.str();
     }
 
     // 用传入的文件路径读取文件 并解释执行
     static void runFile(const char* path) {
-        char* source = readFile(path);
-        InterpretResult result = interpret(source);
-        free(source);
+        std::string source = readFile(path);
+        InterpretResult result = vm.interpret(source.c_str());
 
-        if (result == INTERPRET_COMPILE_ERROR) exit(65);
-        if (result == INTERPRET_RUNTIME_ERROR) exit(70);
+        if (result == InterpretResult::COMPILE_ERROR) exit(65);
+        if (result == InterpretResult::RUNTIME_ERROR) exit(70);
     }
 }
 

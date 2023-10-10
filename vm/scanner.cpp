@@ -6,86 +6,68 @@
 
 #include "scanner.h"
 
-namespace cpplox{
+namespace cpplox {
 
-
-// 单例扫描仪
-     struct Scanner{
-        const char *start;      // 指向起点的指针
-        const char *current;    // 指向当前的指针
-        int line;               // 行号
-    } ;
-
-    Scanner scanner;
-
-    void initScanner(const char *source) {
-        scanner.start = source;
-        scanner.current = source;
-        scanner.line = 1;
-    }
-
-// 是否字母或者下划线开头
+    // 是否字母或者下划线开头
     static bool isAlpha(char c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
     }
 
-// 是否数字开头
+    // 是否数字开头
     static bool isDigit(char c) {
         return c >= '0' && c <= '9';
     }
 
-// 是否走到源代码结束点
-    static bool isAtEnd() {
-        return *scanner.current == '\0';
+    Scanner::Scanner(const char *source) {
+        this->start = source;
+        this->current = source;
+        this->line = 1;
     }
 
-// 扫描推进一格 并返回上一格
-    static char advance() {
-        scanner.current++;
-        return scanner.current[-1];
+    bool Scanner::isAtEnd() {
+        return *this->current == '\0';
     }
 
-// 查看当前扫描的字符  并不推进
-    static char peek() {
-        return *scanner.current;
+    char Scanner::advance() {
+        this->current++;
+        return this->current[-1];
     }
 
-// 查看下一个扫描的字符 并不推进
-    static char peekNext() {
+    char Scanner::peek() {
+        return *this->current;
+    }
+
+    char Scanner::peekNext() {
         if (isAtEnd()) return '\0';
-        return scanner.current[1];
+        return this->current[1];
     }
 
-// 预览 确定目标则推进一格
-    static bool match(char expected) {
+    bool Scanner::match(char expected) {
         if (isAtEnd()) return false;
-        if (*scanner.current != expected) return false;
-        scanner.current++;
+        if (*this->current != expected) return false;
+        this->current++;
         return true;
     }
 
-// 创建一个token
-    static Token makeToken(TokenType type) {
-        Token token;
+    Token Scanner::makeToken(TokenType type) {
+        Token token{};
         token.type = type;
-        token.start = scanner.start;
-        token.length = (int) (scanner.current - scanner.start);
-        token.line = scanner.line;
+        token.start = this->start;
+        token.length = (int) (this->current - this->start);
+        token.line = this->line;
         return token;
     }
 
-// 创建异常令牌 写入异常信息
-    static Token errorToken(const char *message) {
-        Token token;
+    Token Scanner::errorToken(const char *message) const {
+        Token token{};
         token.type = TOKEN_ERROR;
         token.start = message;
         token.length = (int) strlen(message);
-        token.line = scanner.line;
+        token.line = this->line;
         return token;
     }
 
-// 跳过不需要的旁白
-    static void skipWhitespace() {
+    void Scanner::skipWhitespace() {
         for (;;) {
             char c = peek();
             switch (c) {
@@ -95,7 +77,7 @@ namespace cpplox{
                     advance();
                     break;
                 case '\n':
-                    scanner.line++;
+                    this->line++;
                     advance();
                     break;
                 case '/':
@@ -112,19 +94,17 @@ namespace cpplox{
         }
     }
 
-// 检查关键字是否匹配
-    static TokenType checkKeyword(int start, int length, const char *rest, TokenType type) {
-        if (scanner.current - scanner.start == start + length &&
-            memcmp(scanner.start + start, rest, length) == 0) {
+    TokenType Scanner::checkKeyword(int p_start, int length, const char *rest, TokenType type) {
+        if (this->current - this->start == p_start + length &&
+            memcmp(this->start + p_start, rest, length) == 0) {
             return type;
         }
 
         return TOKEN_IDENTIFIER;
     }
 
-// 标识符 token
-    static TokenType identifierType() {
-        switch (scanner.start[0]) {
+    TokenType Scanner::identifierType() {
+        switch (this->start[0]) {
             case 'a':
                 return checkKeyword(1, 2, "nd", TOKEN_AND);
             case 'c':
@@ -132,8 +112,8 @@ namespace cpplox{
             case 'e':
                 return checkKeyword(1, 3, "lse", TOKEN_ELSE);
             case 'f':
-                if (scanner.current - scanner.start > 1) {
-                    switch (scanner.start[1]) {
+                if (this->current - this->start > 1) {
+                    switch (this->start[1]) {
                         case 'a':
                             return checkKeyword(2, 3, "lse", TOKEN_FALSE);
                         case 'o':
@@ -156,10 +136,12 @@ namespace cpplox{
             case 's':
                 return checkKeyword(1, 4, "uper", TOKEN_SUPER);
             case 't':
-                if (scanner.current - scanner.start > 1) {
-                    switch (scanner.start[1]) {
-                        case 'h': return checkKeyword(2, 2, "is", TOKEN_THIS);
-                        case 'r': return checkKeyword(2, 2, "ue", TOKEN_TRUE);
+                if (this->current - this->start > 1) {
+                    switch (this->start[1]) {
+                        case 'h':
+                            return checkKeyword(2, 2, "is", TOKEN_THIS);
+                        case 'r':
+                            return checkKeyword(2, 2, "ue", TOKEN_TRUE);
                     }
                 }
                 break;
@@ -171,14 +153,12 @@ namespace cpplox{
         return TOKEN_IDENTIFIER;
     }
 
-// 标识符 以字母或者下划线开头
-    static Token identifier() {
+    Token Scanner::identifier() {
         while (isAlpha(peek()) || isDigit(peek())) advance();
         return makeToken(identifierType());
     }
 
-// 开始数字扫描
-    static Token number() {
+    Token Scanner::number() {
         while (isDigit(peek())) advance();
 
         // Look for a fractional part.
@@ -192,10 +172,9 @@ namespace cpplox{
         return makeToken(TOKEN_NUMBER);
     }
 
-// 开始字符串扫描
-    static Token string() {
+    Token Scanner::string() {
         while (peek() != '"' && !isAtEnd()) {
-            if (peek() == '\n') scanner.line++;
+            if (peek() == '\n') this->line++;
             advance();
         }
 
@@ -206,11 +185,10 @@ namespace cpplox{
         return makeToken(TOKEN_STRING);
     }
 
-
-    Token scanToken() {
+    Token Scanner::scanToken() {
         skipWhitespace();
 
-        scanner.start = scanner.current;
+        this->start = this->current;
         // 重新标记扫描仪起点并检查源代码是否结束
         if (isAtEnd()) return makeToken(TOKEN_EOF);
 
@@ -255,5 +233,4 @@ namespace cpplox{
 
         return errorToken("Unexpected character.");
     }
-
 }

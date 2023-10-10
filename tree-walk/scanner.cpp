@@ -3,6 +3,8 @@
 //
 #include <map>
 #include "scanner.h"
+#include "../vm/scanner.h"
+
 
 namespace cpplox {
 

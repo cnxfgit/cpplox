@@ -38,12 +38,48 @@ namespace cpplox{
         int line;           // 行号
     } ;
 
-// 初始化扫描仪
-    void initScanner(const char* source);
+    class Scanner {
+    private:
+        const char *start;      // 指向起点的指针
+        const char *current;    // 指向当前的指针
+        int line;               // 行号
 
-// 扫描令牌
+    public:
+        explicit Scanner(const char* source);
+
+        bool isAtEnd();
+
+        char advance();
+
+        char peek();
+
+        char peekNext();
+
+        bool match(char expected);
+
+        Token makeToken(TokenType type);
+
+        Token errorToken(const char *message) const;
+
+        void skipWhitespace();
+
+        TokenType checkKeyword(int p_start, int length, const char *rest, TokenType type);
+
+        TokenType identifierType();
+
+        Token identifier();
+
+        Token number();
+
+        Token string();
+
+        Token scanToken();
+
+        ~Scanner() = default;
+    };
+
+    // 扫描令牌
     Token scanToken();
-
 }
 
 #endif //CPPLOX_SCANNER_H
