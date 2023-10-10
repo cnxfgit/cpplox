@@ -6,7 +6,8 @@
 #define CPPLOX_SCANNER_H
 
 namespace cpplox{
-// 令牌类型枚举
+
+    // 令牌类型枚举
      enum TokenType{
         // 单字符标记
         TOKEN_LEFT_PAREN, TOKEN_RIGHT_PAREN,
@@ -44,9 +45,6 @@ namespace cpplox{
         const char *current;    // 指向当前的指针
         int line;               // 行号
 
-    public:
-        explicit Scanner(const char* source);
-
         bool isAtEnd();
 
         char advance();
@@ -73,13 +71,13 @@ namespace cpplox{
 
         Token string();
 
+    public:
+        explicit Scanner(const char* source);
+
         Token scanToken();
 
         ~Scanner() = default;
     };
-
-    // 扫描令牌
-    Token scanToken();
 }
 
 #endif //CPPLOX_SCANNER_H

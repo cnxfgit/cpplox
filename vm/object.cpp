@@ -152,7 +152,7 @@ namespace cpplox {
         return upvalue;
     }
 
-// 输出函数信息
+    // 输出函数信息
     static void printFunction(ObjFunction *function) {
         if (function->name == nullptr) {
             printf("<script>");

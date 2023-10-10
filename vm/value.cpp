@@ -64,12 +64,8 @@ namespace cpplox {
 
     }
 
-    ValueArray::ValueArray() {
-        compute(0, sizeof(ValueArray));
-    }
-
     ValueArray::~ValueArray() {
-        compute(sizeof(ValueArray) + sizeof(Value) * _data.capacity(), 0);
+        compute( sizeof(Value) * _data.capacity(), 0);
     }
 
     void ValueArray::write(Value value) {
