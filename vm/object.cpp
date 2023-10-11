@@ -88,9 +88,9 @@ namespace cpplox {
         auto *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
         string->chars = new std::string(std::move(chars));
 
-        push(OBJ_VAL(string));
+        vm.push(OBJ_VAL(string));
         vm.strings[string] = NIL_VAL;
-        pop();
+        vm.pop();
         return string;
     }
 

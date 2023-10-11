@@ -31,7 +31,7 @@ namespace cpplox{
     } ;
 
 
-// 词法令牌
+    // 词法令牌
      struct Token{
         TokenType type;     // 令牌类型
         const char* start;  // 起点指针

@@ -53,25 +53,49 @@ namespace cpplox {
 
         // 解释字节码块
         InterpretResult interpret(const char *source);
+
+        void push(Value value);
+
+        Value pop();
+
+        void resetStack();
+
+        void defineNative(const std::string& name, NativeFn function);
+
+    private:
+        void runtimeError(const char *format, ...);
+
+        Value peek(int distance);
+
+        bool call(ObjClosure *closure, int argCount);
+
+        bool callValue(Value callee, int argCount);
+
+        bool invokeFromClass(ObjClass *klass, ObjString *name, int argCount);
+
+        bool invoke(ObjString *name, int argCount);
+
+        bool bindMethod(ObjClass *klass, ObjString *name);
+
+        ObjUpvalue *captureUpvalue(Value *local);
+
+        void closeUpvalues(Value *last);
+
+        void defineMethod(ObjString *name);
+
+        void concatenate();
+
+        InterpretResult run();
     };
-
-
 
     extern VM vm;
 
-// 初始化虚拟机啊
+    // 初始化虚拟机啊
     void initVM();
 
-// 释放虚拟机
+    // 释放虚拟机
     void freeVM();
 
-
-
-// 压入虚拟机栈
-    void push(Value value);
-
-// 弹出虚拟机栈
-    Value pop();
 }
 
 #endif //CPPLOX_VM_H
