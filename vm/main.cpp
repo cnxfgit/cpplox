@@ -4,12 +4,10 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-#include "chunk.h"
 #include "vm.h"
 
 namespace cpplox{
